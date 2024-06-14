@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"sort"
 	"time"
+	"math/rand"
 
 	policyv1 "k8s.io/api/policy/v1"
 
@@ -114,7 +115,14 @@ func UsernameAndPassword(k8sClient k8s.K8sClient, cr *opsterv1.OpenSearchCluster
 		// Use default demo credentials
 		// minimum 8 character password and must contain at least one uppercase letter,
 		// one lowercase letter, one digit, and one special character
-		return "admin", "0penS3@rch!", nil
+		rand.Seed(time.Now().UnixNano())
+		const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*0123456789"
+		var password []byte
+		for i := 0; i < length; i++ {
+			randNum := rand.Intn(len(charSource))
+			password = append(password, charset[randNum])
+		}
+		return "admin", string(password), nil
 	}
 }
 
